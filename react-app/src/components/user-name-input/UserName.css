@@ -1,0 +1,15 @@
+#login {
+  outline: none;
+}
+
+.warn {
+  border-color: red;
+}
+
+.opacity {
+  opacity: 50%;
+}
+
+.bold {
+  font-weight: bold;
+}
