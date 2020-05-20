@@ -35,9 +35,14 @@ app.get('/coin', (req, res) => {
 
 // POSTS: 
 
+let idGenerator = coins.reduce((acc, cur) => {acc > cur.id ? acc : cur.id}, 0);
+
 app.post('/coin', (req, res) => {
-  coins.push(req.body)
-  res.json(coins);
+  let newId = {
+    id: idGenerator++
+  }
+  coins.push({...req.body, ...newId});
+  res.json({...req.body, ...newId});
 })
 
 // DELETES: 

@@ -1,33 +1,61 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Input } from 'antd';
 
 const FORM = styled.form`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 `
-
-const DIV = styled.div`
+const BUTTON = styled.button
+`
   grid-column: 1 / -1;
-  margin: 10px;
+  margin: 5px 0;
 `
 
 class Coins extends React.Component {
   state = {
     data: [],
-    value: 1,
-    id: ''
+    page: 1,
+    id: '',
+    name: '',
+    price: 0,
+    rarity: '',
+    year: 0
   }
   componentDidMount() {
     this.getData();
   }
   getData() {
-    fetch(`http://localhost:3001/coin?count=15&offset=${this.state.value}`)
+    fetch(`http://localhost:3001/coin?count=15&offset=${this.state.page}`)
       .then(res => res.json())
       .then(res => this.setState({ data: res }));
   }
   getValue = (e) => {
-    this.setState({ value: e.target.value }, this.getData);
+    this.setState({ page: e.target.value }, this.getData);
+  }
+  getAntValue = (val, value) => {
+    this.setState({[val]: value})
+  }
+  postData = () => {
+    fetch(
+      `http://localhost:3001/coin/`, 
+      {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        },
+        method: 'POST',
+        body: JSON.stringify(
+          {
+            name: this.state.name,
+            year: this.state.year,
+            price: this.state.price,
+            rarity: this.state.rarity 
+          }
+        )
+      }
+    )
+    this.getData()
   }
   remove = (e) => {
     this.setState({ id: e.target.value }, this.handleRemove)
@@ -60,11 +88,15 @@ class Coins extends React.Component {
     })
   }
   render() {
+    const { page, name, price, rarity, year } = this.state;
     return (
       <FORM onSubmit={(e) => e.preventDefault()}>
-        <DIV>
-          <input style={{ width: '50px' }} onChange={this.getValue} value={this.state.value} type="number" />
-        </DIV>
+        <input style={{width: "100px"}} onChange={this.getValue} value={page} type="number" />
+        <Input onChange={(e) => this.getAntValue('name', e.target.value)} value={name} type="text" placeholder={'Coin name'} />
+        <Input onChange={(e) => this.getAntValue('price', e.target.value)} value={price} type="number" placeholder={'Coin price'} />
+        <Input onChange={(e) => this.getAntValue('rarity', e.target.value)} value={rarity} type="text" placeholder={'Coin rarity'} />
+        <Input onChange={(e) => this.getAntValue('year', e.target.value)} value={year} type="number" placeholder={'Coin year'} />
+        <BUTTON onClick={this.postData} >Send</BUTTON>
         {this.drawData()}
       </FORM>
     );
